@@ -1,0 +1,20 @@
+{
+  "name": "toi",
+  "version": "0.0.1",
+  "description": "物联网业务逻辑开发工具箱",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "toi",
+    "iot"
+  ],
+  "author": "Bijiabo",
+  "license": "ISC",
+  "dependencies": {
+    "download-repo": "^1.0.2",
+    "shelljs": "^0.7.6",
+    "yargs": "^6.6.0"
+  }
+}
