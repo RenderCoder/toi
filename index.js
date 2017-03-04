@@ -7,11 +7,12 @@ var path = require('path');
 var yargs = require('yargs');
 
 var _new = require(path.join(__dirname, 'commands/new'));
-console.log(_new);
+// console.log(_new);
 
 var argv = yargs
     .command(_new)
     .command(require('./commands/download'))
+    .command(require('./commands/build'))
     .option('i', {
         alias : 'init',
         demand: false,
@@ -41,4 +42,4 @@ var argv = yargs
     .epilog('copyright 2015')
     .argv;
 
-console.log('hello ', argv.name);
+// console.log('hello ', argv.name);

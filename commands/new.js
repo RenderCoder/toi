@@ -3,9 +3,9 @@
  */
 
 // var yargs = require('yargs');
-module.exports.command = 'new <platform> [model]'
+module.exports.command = 'new <platform> [model]';
 
-module.exports.describe = 'make a get HTTP request'
+module.exports.describe = 'make a get HTTP request';
 
 module.exports.builder = {
     banana: {
@@ -19,5 +19,5 @@ module.exports.builder = {
 module.exports.handler = function (argv) {
     // do something with argv.
     console.log('run 21..');
-    console.log(argv);
+    // console.log(argv);
 };
