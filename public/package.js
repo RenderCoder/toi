@@ -3,8 +3,11 @@
  */
 const fs = require('fs');
 const path = require('path');
-var co = require('co');
-var co_fs = require('co-fs');
+const co = require('co');
+const co_fs = require('co-fs');
+const ncp = require('ncp').ncp;
+const fileSystemOperation = require('./fileSystemOperation');
+
 
 const cacheDirName = '.cache';
 
@@ -73,6 +76,13 @@ const mkdirs = function () {
 
 const copyFiles = function () {
 
+    ncp('./core/style', './.cache/style', function (err) {
+        if (err) {
+            return console.error(err);
+        }
+        console.log('done!');
+    });
+
     var cp = function* (fileName) {
         console.log(fileName+':');
         var buf = yield co_fs.readFile('./core/' + fileName);
@@ -81,11 +91,9 @@ const copyFiles = function () {
     };
 
     co(function *() {
-
         yield cp('app.js');
         yield cp('app.html');
         yield cp('upt.js');
-
     });
 };
 

@@ -6,11 +6,9 @@ require('shelljs/global');
 var path = require('path');
 var yargs = require('yargs');
 
-var _new = require(path.join(__dirname, 'commands/new'));
-// console.log(_new);
-
 var argv = yargs
-    .command(_new)
+    .command(require('./commands/new'))
+    .command(require('./commands/init'))
     .command(require('./commands/download'))
     .command(require('./commands/build'))
     .option('i', {
