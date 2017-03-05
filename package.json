@@ -1,6 +1,6 @@
 {
   "name": "toi",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "物联网业务逻辑开发工具箱",
   "main": "index.js",
   "scripts": {
@@ -23,5 +23,8 @@
     "prompt": "^1.0.0",
     "shelljs": "^0.7.6",
     "yargs": "^6.6.0"
+  },
+  "bin": {
+    "toi": "index.js"
   }
 }
