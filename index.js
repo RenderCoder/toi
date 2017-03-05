@@ -7,6 +7,7 @@ var path = require('path');
 var yargs = require('yargs');
 
 var argv = yargs
+    .command(require('./commands/start'))
     .command(require('./commands/new'))
     .command(require('./commands/init'))
     .command(require('./commands/download'))
