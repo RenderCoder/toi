@@ -21,8 +21,28 @@ const getPath = function (targetPath) {
 const startServer = function () {
     var app = express();
 
-    app.use('/resources', express.static('core'));
+    app.use('/', express.static(getPath('./')));
+    
+    app.engine('html', require('ejs').renderFile);
 
+    app.get(/\/(\w+\/)?app\.html/, function (req, res) {
+        const filePath = getPath('core/app/app.dev.html');
+        // res.send('request app.html');
+        res.render(filePath);
+    });
+
+    // 获取 xxx/app.js
+    app.get(/\/(\w+\/)?app\.js/, function (req, res) {
+        var targetFilePath = req.path.replace('/app.js','');
+        targetFilePath = targetFilePath.length > 0 ? (targetFilePath+'.js') : '/app.js';
+        targetFilePath = getPath('app/' + targetFilePath);
+        res.sendfile(targetFilePath);
+    });
+
+    app.get(/\/(\w+\/)?viewData\.js/, function (req, res) {
+        res.send('request viewData.js');
+    });
+    /*
     app.get('*', function(req, res){
         // var params = JSON.stringify(req.params);
         // 获取请求路径数组
@@ -57,8 +77,8 @@ const startServer = function () {
                 break;
         }
 
-
     });
+    */
 
     app.use(function(err, req, res, next){
         console.error(err.stack);

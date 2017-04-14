@@ -22,7 +22,7 @@ const createNewPage = function (pageName) {
         return;
     }
     console.log('Creating file [' + pageName + '] ...');
-    ncp('core/viewConfig.js', 'app/'+pageName, function (err) {
+    ncp('core/app/viewConfig.js', 'app/'+pageName, function (err) {
         if (err) {
             return console.error(err);
         }

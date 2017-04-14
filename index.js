@@ -10,6 +10,7 @@ var argv = yargs
     .command(require('./commands/start'))
     .command(require('./commands/new'))
     .command(require('./commands/init'))
+    .command(require('./commands/update'))
     .command(require('./commands/download'))
     .command(require('./commands/build'))
     .option('i', {
