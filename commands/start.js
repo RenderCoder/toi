@@ -24,14 +24,23 @@ const startServer = function () {
     app.use('/', express.static(getPath('./')));
     
     app.engine('html', require('ejs').renderFile);
+    app.engine('js', require('ejs').renderFile);
 
     app.get(/\/(\w+\/)?app\.html/, function (req, res) {
         const filePath = getPath('core/app/app.dev.html');
+        
         var targetFilePath = req.path.replace('/app.html','');
-        targetFilePath = targetFilePath.length > 0 ? (targetFilePath+'.js') : '/app.js';
+        const isSubPath = targetFilePath.length > 0; // 是否为子目录页面
+        targetFilePath = isSubPath ? (targetFilePath+'.js') : '/app.js';
+        const targetFileName = targetFilePath.replace('/', '').replace('.js', '');
         targetFilePath = getPath('app/' + targetFilePath);
+        
         if (fs.existsSync(targetFilePath)) {
-            res.render(filePath);
+            console.log(targetFileName);
+            res.render(filePath, {
+                file: targetFileName,
+                isSubPath: isSubPath
+            });
         } else {
             res.send('找不到文件: ' + targetFilePath);
         }
@@ -40,10 +49,18 @@ const startServer = function () {
 
     // 获取 xxx/app.js
     app.get(/\/(\w+\/)?app\.js/, function (req, res) {
+        /*
         var targetFilePath = req.path.replace('/app.js','');
         targetFilePath = targetFilePath.length > 0 ? (targetFilePath+'.js') : '/app.js';
         targetFilePath = getPath('app/' + targetFilePath);
         res.sendfile(targetFilePath);
+        */
+        const originalFilePath = getPath('core/app/app.dev.js');
+        res.render(originalFilePath, {
+            test: 'xxx',
+            viewConfigFile: req.query.file,
+            subPath: req.query.subpath ? '../' : ''
+        });
     });
 
     app.get(/\/(\w+\/)?viewData\.js/, function (req, res) {
