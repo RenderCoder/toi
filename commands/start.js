@@ -27,8 +27,15 @@ const startServer = function () {
 
     app.get(/\/(\w+\/)?app\.html/, function (req, res) {
         const filePath = getPath('core/app/app.dev.html');
-        // res.send('request app.html');
-        res.render(filePath);
+        var targetFilePath = req.path.replace('/app.html','');
+        targetFilePath = targetFilePath.length > 0 ? (targetFilePath+'.js') : '/app.js';
+        targetFilePath = getPath('app/' + targetFilePath);
+        if (fs.existsSync(targetFilePath)) {
+            res.render(filePath);
+        } else {
+            res.send('找不到文件: ' + targetFilePath);
+        }
+        
     });
 
     // 获取 xxx/app.js
