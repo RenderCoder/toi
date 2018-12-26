@@ -7,9 +7,14 @@ const path = require("path");
 const {exec} = require("child_process");
 const logSymbols = require("log-symbols");
 const qrcode = require("qrcode-terminal");
+const archiver = require("archiver");
 
 let _arguments = {};
-const reactNativeServerPort = 8002;
+const packagePaths = {
+  bundle: "package",
+  Android: "package/Android",
+  iOS: "package/iOS",
+};
 
 const parseArguments = function (argv) {
   _arguments = argv;
@@ -27,8 +32,9 @@ const parseArguments = function (argv) {
   // console.log(arguments);
 };
 
-const execShell = (line) => {
-  const _process = exec(line, {});
+const execShell = (line, callback = () => {
+}) => {
+  const _process = exec(line, {}, callback);
   _process.stdout.on("data", data => {
     console.log(data);
   });
@@ -46,60 +52,6 @@ const packageJSONFileExists = function (dirPath) {
   }
   return true;
 };
-
-const getNetworkIP = (function () {
-  var ignoreRE = /^(127\.0\.0\.1|::1|fe80(:1)?::1(%.*)?)$/i;
-
-  var exec = require("child_process").exec;
-  var cached;
-  var command;
-  var filterRE;
-
-  switch (process.platform) {
-    // TODO: implement for OSs without ifconfig command
-    case "darwin":
-      command = "ifconfig";
-      filterRE = /\binet\s+([^\s]+)/g;
-      // filterRE = /\binet6\s+([^\s]+)/g; // IPv6
-      break;
-    default:
-      command = "ifconfig";
-      filterRE = /\binet\b[^:]+:\s*([^\s]+)/g;
-      // filterRE = /\binet6[^:]+:\s*([^\s]+)/g; // IPv6
-      break;
-  }
-
-  return function (callback, bypassCache) {
-    // get cached value
-    if (cached && !bypassCache) {
-      callback(null, cached);
-      return;
-    }
-    // system call
-    exec(command, function (error, stdout, sterr) {
-      var ips = [];
-      // extract IPs
-      var matches = stdout.match(filterRE);
-      // JS has no lookbehind REs, so we need a trick
-      for (var i = 0; i < matches.length; i++) {
-        ips.push(matches[i].replace(filterRE, "$1"));
-      }
-
-      // filter BS
-      for (var i = 0, l = ips.length; i < l; i++) {
-        if (!ignoreRE.test(ips[i])) {
-          //if (!error) {
-          cached = ips[i];
-          //}
-          callback(error, ips[i]);
-          return;
-        }
-      }
-      // nothing found
-      callback(error, null);
-    });
-  };
-})();
 
 const getApplicationJSONConfigurationContent = function () {
   const fileName = "app.json";
@@ -121,40 +73,119 @@ const getApplicationJSONConfigurationContent = function () {
   }
 };
 
-const generateZipPackageFileName = function () {
+const generateZipPackageFileName = function (platform) {
   const applicationConfiguration = getApplicationJSONConfigurationContent();
   if (!applicationConfiguration) {
     return false;
   }
 
+  const applicationConfigurationFormatError = [
+    applicationConfiguration.panelType,
+    applicationConfiguration.deviceType,
+    applicationConfiguration.brand,
+    applicationConfiguration.model,
+  ].filter(function (item) {
+    return item === undefined;
+  }).length > 0;
+  if (applicationConfigurationFormatError) {
+    console.log(logSymbols.error, "[Error] Application configuration content format error.");
+    return;
+  }
 
+  const zipFileName = `${applicationConfiguration.panelType}_${applicationConfiguration.deviceType}_${applicationConfiguration.brand}_${applicationConfiguration.model}_${platform}`;
+  return zipFileName;
 };
 
 /**
  * generate package command line string
- * @returns {string}
+ * @returns {string | undefined}
  */
 const generateCommand = function () {
 
-  const packagePaths = {
-    Android: "bundle/Android",
-    iOS: "bundle/iOS",
-  };
+  const zipPackageFileName = generateZipPackageFileName();
+  if (!zipPackageFileName) {
+    return;
+  }
+
   const commands = [
     // createFolders
-    "mkdir -p bundle/Android",
-    "mkdir -p bundle/iOS",
+    `mkdir -p ${packagePaths.Android}`,
+    `mkdir -p ${packagePaths.iOS}`,
     // package
     `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.Android}/index.mxbundle --platform android --assets-dest ./${packagePaths.Android} --dev false`,
     `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.iOS}/index.mxbundle --platform ios --assets-dest ./${packagePaths.iOS} --dev false`,
-    // zip files
-
   ];
   return commands.join(" && ");
 };
 
+const packFolderIntoZipBundle = function (folderPath, targetZipPath) {
+  const output = fs.createWriteStream(targetZipPath);
+  const archive = archiver("zip", {
+    zlib: {level: 9}, // Sets the compression level.
+  });
+  // listen for all archive data to be written
+  // 'close' event is fired only when a file descriptor is involved
+  output.on("close", function () {
+    console.log(archive.pointer() + " total bytes");
+    console.log(logSymbols.success, "[Success] archiver has been finalized and the output file descriptor has closed.");
+  });
+
+  // This event is fired when the data source is drained no matter what was the data source.
+  // It is not part of this library but rather from the NodeJS Stream API.
+  // @see: https://nodejs.org/api/stream.html#stream_event_end
+  output.on("end", function () {
+    console.log("Data has been drained");
+  });
+
+  // good practice to catch warnings (ie stat failures and other non-blocking errors)
+  archive.on("warning", function (err) {
+    if (err.code === "ENOENT") {
+      // log warning
+    } else {
+      // throw error
+      throw err;
+    }
+  });
+
+  // good practice to catch this error explicitly
+  archive.on("error", function (err) {
+    throw err;
+  });
+
+  // pipe archive data to the file
+  archive.pipe(output);
+  archive.directory(folderPath, false);
+  archive.finalize();
+};
+
+const packFilesIntoZipBundle = function () {
+  const iOSZipFileName = generateZipPackageFileName("iOS");
+  const AndroidZipFileName = generateZipPackageFileName("Android");
+
+  if (iOSZipFileName) {
+    packFolderIntoZipBundle(
+      path.join(_arguments.targetPath, packagePaths.iOS),
+      path.join(_arguments.targetPath, packagePaths.bundle, `${iOSZipFileName}.zip`)
+    );
+  }
+
+  if (AndroidZipFileName) {
+    packFolderIntoZipBundle(
+      path.join(_arguments.targetPath, packagePaths.iOS),
+      path.join(_arguments.targetPath, packagePaths.bundle, `${AndroidZipFileName}.zip`)
+    );
+  }
+};
+
 const runPackageCommand = function () {
-  execShell(generateCommand());
+  execShell(generateCommand(), (error, stdout, stderr) => {
+    if (error) {
+      console.log(logSymbols.error, error);
+      return;
+    }
+    console.log("Create zip file...");
+    packFilesIntoZipBundle();
+  });
 };
 
 module.exports.command = "package";

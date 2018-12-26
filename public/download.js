@@ -32,7 +32,7 @@ const download = {
     });
   },
   devicePanel: function (targetPath, callback) {
-    const gitUrl = "github:Bijiabo/ImageConverter";
+    const gitUrl = "github:Bijiabo/Business-Template-APP-DemoPanelProject";
     console.log("start download device panel project...");
     var done = function (error) {
       if (error) {
