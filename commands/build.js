@@ -1,8 +1,4 @@
-/**
- * Created by huchunbo on 2017/3/4.
- */
-
-var package = require('./../public/package');
+var package = require('./package');
 
 module.exports.command = 'build';
 

@@ -1,7 +1,3 @@
-/**
- * Created by huchunbo on 2017/3/4.
- */
-
 const fs = require('fs');
 const path = require('path');
 const co = require('co');

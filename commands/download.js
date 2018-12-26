@@ -1,7 +1,3 @@
-/**
- * Created by huchunbo on 2017/3/4.
- */
-
 // var yargs = require('yargs');
 var download = require('./../public/download');
 
