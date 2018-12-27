@@ -159,6 +159,7 @@ const packFolderIntoZipBundle = function (folderPath, targetZipPath) {
 };
 
 const packFilesIntoZipBundle = function () {
+  console.log("Create zip file...");
   const iOSZipFileName = generateZipPackageFileName("iOS");
   const AndroidZipFileName = generateZipPackageFileName("Android");
 
@@ -177,13 +178,29 @@ const packFilesIntoZipBundle = function () {
   }
 };
 
+const copyApplicationConfigurationFile = () => {
+  const fileName = "app.json";
+  const originalAppJSONFilePath = path.join(_arguments.targetPath, fileName);
+  const AndroidAppJSONFilePath = path.join(_arguments.targetPath, packagePaths.Android, fileName);
+  const iOSAppJSONFilePath = path.join(_arguments.targetPath, packagePaths.iOS, fileName);
+
+  if (!fs.existsSync(originalAppJSONFilePath)) {
+    console.log(logSymbols.error, `[Error] ${fileName} does not exist at ${originalAppJSONFilePath}`);
+    return;
+  }
+
+  fs.copyFileSync(originalAppJSONFilePath, AndroidAppJSONFilePath);
+  fs.copyFileSync(originalAppJSONFilePath, iOSAppJSONFilePath);
+};
+
 const runPackageCommand = function () {
   execShell(generateCommand(), (error, stdout, stderr) => {
     if (error) {
       console.log(logSymbols.error, error);
       return;
     }
-    console.log("Create zip file...");
+
+    copyApplicationConfigurationFile();
     packFilesIntoZipBundle();
   });
 };

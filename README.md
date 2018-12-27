@@ -19,3 +19,7 @@ Examples:
 
 copyright 2018
 ```
+
+## Update
+
+* `2018/12/27` `Fix`: copy `app.json` into package bundle.
