@@ -7,5 +7,5 @@ module.exports.command = "version";
 module.exports.describe = "";
 
 module.exports.handler = function (argv) {
-  console.log("Version: 1.0.0");
+  console.log("Version: 0.0.4");
 };

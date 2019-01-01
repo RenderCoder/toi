@@ -112,8 +112,8 @@ const generateCommand = function () {
     `mkdir -p ${packagePaths.Android}`,
     `mkdir -p ${packagePaths.iOS}`,
     // package
-    `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.Android}/index.mxbundle --platform android --assets-dest ./${packagePaths.Android} --dev false`,
-    `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.iOS}/index.mxbundle --platform ios --assets-dest ./${packagePaths.iOS} --dev false`,
+    `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.Android}/index.mxbundle --platform android --assets-dest ./${packagePaths.Android} --sourcemap-output ./${packagePaths.Android}/index.mxbundle.map --dev false`,
+    `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.iOS}/index.mxbundle --platform ios --assets-dest ./${packagePaths.iOS} --sourcemap-output ./${packagePaths.iOS}/index.mxbundle.map --dev false`,
   ];
   return commands.join(" && ");
 };
@@ -172,7 +172,7 @@ const packFilesIntoZipBundle = function () {
 
   if (AndroidZipFileName) {
     packFolderIntoZipBundle(
-      path.join(_arguments.targetPath, packagePaths.iOS),
+      path.join(_arguments.targetPath, packagePaths.Android),
       path.join(_arguments.targetPath, packagePaths.bundle, `${AndroidZipFileName}.zip`)
     );
   }
