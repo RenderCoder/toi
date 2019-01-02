@@ -23,13 +23,13 @@ const parseArguments = function (argv) {
   _arguments.currentExecuteCommandPath = currentExecuteCommandPath;
 
   if (argv._.length > 1) {
-    const targetPath = argv._[1];
-    _arguments.targetPath = path.join(currentExecuteCommandPath, targetPath);
-  } else {
-    _arguments.targetPath = currentExecuteCommandPath;
+    if (argv._.includes("no-zip")) {
+      _arguments.noZip = true;
+    }
   }
+  _arguments.targetPath = currentExecuteCommandPath;
 
-  // console.log(arguments);
+  // console.log(_arguments);
 };
 
 const execShell = (line, callback = () => {
@@ -102,10 +102,10 @@ const generateZipPackageFileName = function (platform) {
  */
 const generateCommand = function () {
 
-  const zipPackageFileName = generateZipPackageFileName();
-  if (!zipPackageFileName) {
-    return;
-  }
+  // const zipPackageFileName = generateZipPackageFileName();
+  // if (!zipPackageFileName) {
+  //   return;
+  // }
 
   const commands = [
     // createFolders
@@ -200,8 +200,10 @@ const runPackageCommand = function () {
       return;
     }
 
-    copyApplicationConfigurationFile();
-    packFilesIntoZipBundle();
+    if (!_arguments.noZip) {
+      copyApplicationConfigurationFile();
+      packFilesIntoZipBundle();
+    }
   });
 };
 
@@ -209,6 +211,7 @@ module.exports.command = "package";
 module.exports.describe = "package project";
 module.exports.handler = function (argv) {
   parseArguments(argv);
+
   if (!packageJSONFileExists(_arguments.targetPath)) {
     return;
   }
