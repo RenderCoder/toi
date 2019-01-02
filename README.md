@@ -23,3 +23,4 @@ copyright 2018
 ## Update
 
 * `2018/12/27` `Fix`: copy `app.json` into package bundle.
+* `2019/01/01` `Fix`: wrong path for Android package
