@@ -1,6 +1,6 @@
 {
   "name": "toi",
-  "version": "0.0.6",
+  "version": "0.0.9",
   "description": "A tool for develop IoT project.",
   "main": "index.js",
   "scripts": {
@@ -15,18 +15,25 @@
   "license": "ISC",
   "dependencies": {
     "archiver": "^3.0.0",
+    "axios": "^0.18.0",
+    "axios-retry": "^3.1.2",
     "co": "^4.6.0",
     "co-fs": "^1.2.0",
     "colors": "^1.1.2",
+    "colors-cli": "^1.0.21",
     "download-git-repo": "^0.2.1",
     "download-repo": "^1.0.2",
     "ejs": "^2.5.6",
     "express": "^4.15.0",
     "github-download": "^0.5.0",
+    "inquirer": "^6.2.2",
     "log-symbols": "^2.2.0",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.23",
     "ncp": "^2.0.0",
     "prompt": "^1.0.0",
     "qrcode-terminal": "^0.12.0",
+    "serialport": "^7.1.4",
     "shelljs": "^0.7.6",
     "yargs": "^6.6.0"
   },

@@ -4,9 +4,11 @@
  */
 const fs = require("fs");
 const path = require("path");
-const {exec} = require("child_process");
+const {exec, spawn} = require("child_process");
 const logSymbols = require("log-symbols");
 const qrcode = require("qrcode-terminal");
+const axios = require("axios")
+const axiosRetry = require("axios-retry")
 
 let _arguments = {};
 const reactNativeServerPort = 8002;
@@ -17,25 +19,22 @@ const parseArguments = function (argv) {
   const currentExecuteCommandPath = process.cwd();
   _arguments.currentExecuteCommandPath = currentExecuteCommandPath;
 
+  if (!Number.isInteger(argv.port)) {
+    console.log(`端口号必须为数字，使用默认端口替代：${reactNativeServerPort}`)
+    _arguments.port = reactNativeServerPort
+  }
+
   if (argv._.length > 1) {
-    const targetPath = argv._[1];
-    _arguments.targetPath = path.join(currentExecuteCommandPath, targetPath);
+    const targetPort = argv._[1];
+    if (Number.isInteger(targetPort)){
+      throw "Target port should be a number."
+    }
+    _arguments.targetPort = path.join(currentExecuteCommandPath, targetPort);
   } else {
     _arguments.targetPath = currentExecuteCommandPath;
   }
 
-  // console.log(arguments);
-};
-
-const execShell = (line) => {
-  const _process = exec(line, {});
-  _process.stdout.on("data", data => {
-    console.log(data);
-  });
-
-  _process.stderr.on("data", data => {
-    console.log(logSymbols.error, data);
-  });
+  // console.log(_arguments)
 };
 
 const packageJSONFileExists = function (dirPath) {
@@ -135,8 +134,8 @@ const generateAndDisplayQRCodeInCommandLine = function () {
     let qrCodeContent = {
       "protocol": "http",
       "host": ip,
-      "port": reactNativeServerPort,
-      "moduleName": applicationJSONConfiguration.moduleName || "mainx", // 默认为 main
+      "port": _arguments.port,
+      "moduleName": applicationJSONConfiguration.moduleName || "main", // 默认为 main
     };
     qrCodeContent = JSON.stringify(qrCodeContent);
     console.log(`${qrCodeContent}\n\nPlease use application scan this QRCode :)\n`);
@@ -145,12 +144,33 @@ const generateAndDisplayQRCodeInCommandLine = function () {
 };
 
 const startReactNativeServer = function () {
-  const serverPort = reactNativeServerPort;
-  execShell(`react-native start --port ${serverPort}`);
+  const serverPort = _arguments.port;
+  spawn('react-native', ['start', '--port', `${serverPort}`], { stdio: 'inherit' });
 };
 
+const watchReactNativePackagerServerStart = function(callback) {
+  axiosRetry(axios, {
+    retries: 10,
+    retryDelay: function(retryCount) {
+      return 1000
+    },
+  })
+
+  axios.get(`http://localhost:${_arguments.port}/`)
+    .then(result => {
+      if (result.status === 200) {
+        setTimeout(callback, 1000)
+      } else {
+        console.log("Can not connect React Native packager server.")
+      }
+    })
+    .catch(error => {
+      console.log("error")
+    })
+}
+
 const runDevCommand = function () {
-  generateAndDisplayQRCodeInCommandLine();
+  watchReactNativePackagerServerStart(generateAndDisplayQRCodeInCommandLine);
   startReactNativeServer();
 };
 

@@ -38,6 +38,8 @@ var argv = yargs
   .usage("Usage: toi [options]")
   // 示例
   .example("toi init demo", "create a demo device panel project")
+  .example("toi run", "")
+  .example("toi run --port 8001", "")
   .help("h")
   .alias("h", "help")
   .epilog("copyright 2018")
