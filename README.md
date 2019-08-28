@@ -12,6 +12,8 @@ Commands:
   run      run server
   package  package project
   `package no-zip` package project without zip bundle
+  package --map   build zip with bundle.map
+  package --type xxx   customize deviceType
   version
 
 Options:
@@ -19,8 +21,7 @@ Options:
 
 Examples:
   toi init demo       create a demo device panel project
-  toi package --map   //build zip with bundle.map
-  toi package --type xxx   //custimize deviceType
+
 copyright 2019
 ```
 
