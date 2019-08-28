@@ -42,5 +42,6 @@ var argv = yargs
   .example("toi run --port 8001", "")
   .help("h")
   .alias("h", "help")
+  .alias("sm","sourcemap")
   .epilog("copyright 2018")
   .argv;
