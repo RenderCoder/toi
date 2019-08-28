@@ -110,30 +110,21 @@ const generateCommand = function (argv) {
   //   return;
   // }
 
+
   let commands
-  if(argv.map){
-    commands = [
-      // createFolders
-      `mkdir -p ${packagePaths.Android}`,
-      `mkdir -p ${packagePaths.iOS}`,
-      `rm -f ./${packagePaths.Android}/index.mxbundle.map`,
-      `rm -f ./${packagePaths.iOS}/index.mxbundle.map`,
-      // package
-      `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.Android}/index.mxbundle --platform android --assets-dest ./${packagePaths.Android} --sourcemap-output ./${packagePaths.Android}/index.mxbundle.map --dev false`,
-      `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.iOS}/index.mxbundle --platform ios --assets-dest ./${packagePaths.iOS} --sourcemap-output ./${packagePaths.iOS}/index.mxbundle.map --dev false`,
-    ]
-  } else{
-    commands = [
-      // createFolders
-      `mkdir -p ${packagePaths.Android}`,
-      `mkdir -p ${packagePaths.iOS}`,
-      `rm -f ./${packagePaths.Android}/index.mxbundle.map`,
-      `rm -f ./${packagePaths.iOS}/index.mxbundle.map`,
-      // package
-      `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.Android}/index.mxbundle --platform android --assets-dest ./${packagePaths.Android} --dev false`,
-      `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.iOS}/index.mxbundle --platform ios --assets-dest ./${packagePaths.iOS} --dev false`,
-    ]
-  }
+
+  let withMap = argv.map ? `--sourcemap-output ./${packagePaths.iOS}/index.mxbundle.map` : ""
+
+  commands = [
+    // createFolders
+    `mkdir -p ${packagePaths.Android}`,
+    `mkdir -p ${packagePaths.iOS}`,
+    `rm -f ./${packagePaths.Android}/index.mxbundle.map`,
+    `rm -f ./${packagePaths.iOS}/index.mxbundle.map`,
+    // package
+    `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.Android}/index.mxbundle --platform android --assets-dest ./${packagePaths.Android} --dev false ${withMap}`,
+    `react-native bundle --entry-file index.js --bundle-output ./${packagePaths.iOS}/index.mxbundle --platform ios --assets-dest ./${packagePaths.iOS} --dev false ${withMap}`,
+  ]
   return commands.join(" && ")
 }
 
