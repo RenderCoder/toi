@@ -12,7 +12,7 @@ Commands:
   run      run server
   package  package project
   package no-zip package project without zip bundle
-  package no-map   build zip with bundle.map
+  package no-map   build zip without bundle.map
   package --type xxx   customize deviceType
   version
 
