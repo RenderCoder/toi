@@ -8,6 +8,10 @@ var argv = yargs
   .command(require("./commands/run"))
   .command(require("./commands/package"))
   .command(require("./commands/version"))
+  .command(require("./commands/entry"))
+  .command(require("./commands/panelkey"))
+  .command(require("./commands/store"))
+  .command(require("./commands/navconfig"))
   // .command(require('./commands/start'))
   // .command(require('./commands/new'))
   // .command(require('./commands/update'))
@@ -43,5 +47,5 @@ var argv = yargs
   .help("h")
   .alias("h", "help")
   .alias("sm","sourcemap")
-  .epilog("copyright 2018")
+  .epilog("copyright 2019")
   .argv;
