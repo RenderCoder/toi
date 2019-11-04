@@ -1,5 +1,8 @@
 const _download = require("download-git-repo");
-
+const tip = require('../lib/tip');
+const exec = require('child_process').exec;
+const ora = require('ora');
+const spinner = ora('正在生成...');
 const download = {
   core: function (callback) {
     console.log("start download upt-core...");
@@ -32,20 +35,32 @@ const download = {
     });
   },
   devicePanel: function (targetPath, callback) {
-    const gitUrl = "github:Bijiabo/Business-Template-APP-DemoPanelProject";
+    const gitUrl = "https://e.coding.net/mxchip/smarthome_panel.git";
     console.log("start download device panel project...");
-    var done = function (error) {
+    var done = function (error, projectName ) {
+      spinner.stop();
       if (error) {
         console.log(error);
+        tip.fail('请重新运行!');
         return;
       }
-      console.log("download device panel project completed!");
+      // 删除 git 文件
+      exec('cd ' + projectName + ' && rm -rf .git', (err, out) => {
+        tip.info(`cd ${projectName} && npm install`);
+        tip.suc("download device panel project completed!");
+      });
       callback();
     };
-    _download(gitUrl, targetPath, function (err) {
+    const cmdStr = `git clone ${gitUrl} ${targetPath} && cd ${targetPath}`;
+    spinner.start();
+    exec(cmdStr, (err) => {
       if (err) return done(err);
-      done();
+      done(err,targetPath);
     });
+    // _download(gitUrl, targetPath, { clone: true }, function (err) {
+    //   if (err) return done(err);
+    //   done();
+    // });
   },
 };
 
