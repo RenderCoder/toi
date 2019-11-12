@@ -12,6 +12,7 @@ var argv = yargs
   // .command(require('./commands/start'))
   .command(require('./commands/new'))
   .command(require('./commands/svg'))
+  .command(require('./commands/entry'))
   // .command(require('./commands/update'))
   // .command(require('./commands/download'))
   /*
